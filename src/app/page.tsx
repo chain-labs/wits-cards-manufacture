@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Card } from "@/types";
 import Button from "@/components/Button";
+import { Button as ShadButton } from "@/components/ui/button";
 import { useSelectedCardsTable } from "@/store";
 import { DataTable } from "@/components/DataTable";
 import { columns } from "@/components/TableColumn";
@@ -52,6 +53,7 @@ function GetCardData() {
             setSelectedCard(card);
           }
         }}
+        value={selectedCard?.tokenId}
       >
         <SelectTrigger className="w-[180px] bg-white">
           <SelectValue placeholder="Choose A Card" />
@@ -82,16 +84,19 @@ function GetCardData() {
       />
 
       {/* submit button */}
-      <Button type="submit" disabled={selectedCard === null || quantity <= 0}>
+      <ShadButton
+        type="submit"
+        disabled={selectedCard === null || quantity <= 0}
+      >
         Add Card
-      </Button>
+      </ShadButton>
     </form>
   );
 }
 
 export default function Home() {
-  const { list } = useSelectedCardsTable();
-  console.log('list', list);
+  const { list, count } = useSelectedCardsTable();
+  console.log("list", count);
   return (
     <div
       style={{
@@ -106,6 +111,9 @@ export default function Home() {
       {/* <Header /> */}
       <GetCardData />
       <DataTable columns={columns} data={list} />
+      <Button type="submit" disabled={count <= 0}>
+        Manufacture
+      </Button>
     </div>
   );
 }
