@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { beaufortPro } from "@/fonts";
 import { cn } from "@/utils";
+import "@rainbow-me/rainbowkit/styles.css";
+import RainbowKitContext from "@/RanbowKit";
 
 export const metadata: Metadata = {
   title: "WITS Idle Game",
@@ -16,8 +18,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cn(beaufortPro.className, "bg-black")}>
-        <div id="modal" className="fixed z-50"></div>
-        {children}
+        <RainbowKitContext>
+          <div id="modal" className="fixed z-50"></div>
+          {children}
+        </RainbowKitContext>
       </body>
     </html>
   );

@@ -1,16 +1,17 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { Card } from "@/types";
 import { Button as ShadButton } from "@/components/ui/button";
 import useCards from "@/hooks/useCards";
 import { useSelectedCardsTable } from "@/store";
+import { SearchAndSelectCard } from "./SearchAndSelectCard";
 
 export default function GetCardData() {
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
@@ -23,7 +24,7 @@ export default function GetCardData() {
     setUnselectedCards(
       cardsData.filter((card) => {
         return list.every((selectedCard) => selectedCard.id !== card.id);
-      })
+      }),
     );
   }, [cardsData, list]);
 
@@ -48,28 +49,13 @@ export default function GetCardData() {
       className="flex justify-center items-center gap-[24px]"
     >
       {/* dropdown */}
-      <Select
-        onValueChange={(value) => {
-          const card = UnselectedCards.find((item) => String(item.id) === value);
-          if (card) {
-            setSelectedCard(card);
-          }
-        }}
-        value={String(selectedCard?.id)}
-      >
-        <SelectTrigger className="w-[180px] bg-white">
-          <SelectValue placeholder="Choose A Card" />
-        </SelectTrigger>
-        <SelectContent>
-          {UnselectedCards.map((item) => (
-            <SelectItem key={item.id} value={String(item.id)}>
-              {item.tid} (id: {item.tid})
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <SearchAndSelectCard
+        list={UnselectedCards}
+        value={selectedCard}
+        setValue={setSelectedCard}
+      />
+      
       {/* input quantity */}
-
       <Input
         type="number"
         placeholder="Quantity"

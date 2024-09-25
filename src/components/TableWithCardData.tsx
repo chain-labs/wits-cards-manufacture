@@ -25,20 +25,20 @@ function CardQuantity({ card }: { card: CardWithQuantity }) {
   return (
     <div className="flex justify-center items-center gap-2 w-full">
       <Button
-        onClick={() => upadteCardQuantity(card, card.quantity + 1)}
-        size="sm"
-        variant="secondary"
-      >
-        +
-      </Button>
-      <p>{card.quantity}</p>
-      <Button
         onClick={() => upadteCardQuantity(card, card.quantity - 1)}
         size="sm"
         variant="secondary"
         disabled={card.quantity <= 1}
       >
         -
+      </Button>
+      <p>{card.quantity}</p>
+      <Button
+        onClick={() => upadteCardQuantity(card, card.quantity + 1)}
+        size="sm"
+        variant="secondary"
+      >
+        +
       </Button>
     </div>
   );

@@ -7,9 +7,14 @@ import Button from "@/components/Button";
 import { useSelectedCardsTable } from "@/store";
 import GetCardData from "@/components/GetCardData";
 import TableWithCardData from "@/components/TableWithCardData";
+import { useState } from "react";
+import Manufacutre from "./Manufacutre";
+
+type States = "selection" | "manufacture" | "idle";
 
 export default function Home() {
   const { count } = useSelectedCardsTable();
+  const [state, setState] = useState<States>("selection");
   return (
     <div
       style={{
@@ -21,12 +26,26 @@ export default function Home() {
         "px-[16px]",
       )}
     >
-      {/* <Header /> */}
-      <GetCardData />
-      <TableWithCardData />
-      <Button type="submit" disabled={count <= 0}>
-        Manufacture
-      </Button>
+      {
+        {
+          selection: (
+            <>
+              <GetCardData />
+              <TableWithCardData />
+              <Button
+                disabled={count <= 0}
+                onClick={() => {
+                  setState("manufacture");
+                }}
+              >
+                Manufacture
+              </Button>
+            </>
+          ),
+          manufacture: <Manufacutre />,
+          idle: <></>,
+        }[state]
+      }
     </div>
   );
 }
