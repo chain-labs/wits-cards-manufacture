@@ -1,9 +1,16 @@
 export type Rarity = "common" | "uncommon" | "rare" | "mythical" | "legendary";
 
 export interface Card {
-  name: string;
+  id: number;
+  tid: string;
+  type: string;
+  alliance: string;
   rarity: Rarity;
-  tokenId: string;
+  mana: number;
+  attack: number;
+  hp: number;
+  cost: number;
+  packs: string[];
 }
 
 export type CardWithQuantity = {

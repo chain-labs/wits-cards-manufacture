@@ -8,6 +8,7 @@ type SelectedCardsTable = {
   list: CardWithQuantity[];
   addCard: (card: CardWithQuantity) => void;
   removeCard: (card: CardWithQuantity) => void;
+  upadteCardQuantity: (card: CardWithQuantity, quantity: number) => void;
 };
 
 export const useSelectedCardsTable = create<SelectedCardsTable>((set) => ({
@@ -15,9 +16,7 @@ export const useSelectedCardsTable = create<SelectedCardsTable>((set) => ({
   list: [],
   addCard: (card: CardWithQuantity) => {
     set((state) => {
-      const isCardInTheList = state.list.some(
-        (c) => c.tokenId === card.tokenId,
-      );
+      const isCardInTheList = state.list.some((c) => c.id === card.id);
       if (isCardInTheList === false) {
         return {
           count: state.count + 1,
@@ -29,12 +28,26 @@ export const useSelectedCardsTable = create<SelectedCardsTable>((set) => ({
   },
   removeCard: (card) => {
     set((state) => {
-      const cardIndex = state.list.findIndex((c) => c.tokenId === card.tokenId);
+      const cardIndex = state.list.findIndex((c) => c.id === card.id);
       if (cardIndex !== -1) {
         const list = [...state.list];
         list.splice(cardIndex, 1);
         return {
           count: state.count - 1,
+          list,
+        };
+      }
+      return state;
+    });
+  },
+  upadteCardQuantity: (card, quantity) => {
+    set((state) => {
+      const cardIndex = state.list.findIndex((c) => c.id === card.id);
+      if (cardIndex !== -1) {
+        const list = [...state.list];
+        list[cardIndex] = { ...card, quantity };
+        return {
+          count: state.count,
           list,
         };
       }
