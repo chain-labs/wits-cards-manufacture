@@ -1,18 +1,179 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/utils";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useState } from "react";
+import { useAccount } from "wagmi";
+
+type buttonStates = "Allocate Tokens" | "Generate Proof" | "Manufacture";
+
+const diabledButtonsState: Record<
+  buttonStates,
+  {
+    active: boolean;
+    disabled: boolean;
+    success: boolean;
+  }
+> = {
+  "Allocate Tokens": {
+    active: false,
+    disabled: true,
+    success: false,
+  },
+  "Generate Proof": {
+    active: false,
+    disabled: true,
+    success: false,
+  },
+  Manufacture: {
+    active: false,
+    disabled: true,
+    success: false,
+  },
+};
 
 export default function Manufacutre() {
+  const [state, setState] = useState<
+    Record<
+      buttonStates,
+      {
+        active: boolean;
+        disabled: boolean;
+        success: boolean;
+      }
+    >
+  >({
+    "Allocate Tokens": {
+      active: false,
+      disabled: true,
+      success: false,
+    },
+    "Generate Proof": {
+      active: false,
+      disabled: true,
+      success: false,
+    },
+    Manufacture: {
+      active: false,
+      disabled: true,
+      success: false,
+    },
+  });
+  const [value, setValue] = useState<string>("");
+  const [privatekeyError, setPrivatekeyError] = useState<boolean>(false);
+  const account = useAccount();
+
+  function settingActivePhaseButton(string: buttonStates) {
+    const newState: typeof state = { ...state };
+    for (const key in newState) {
+      if (key === string) {
+        newState[key] = {
+          active: true,
+          disabled: false,
+          success: false,
+        };
+      } else {
+        newState[key as buttonStates] = {
+          active: false,
+          disabled: true,
+          success:
+            (key === "Allocate Tokens" &&
+              (string === "Generate Proof" || string === "Manufacture")) ||
+            (key === "Generate Proof" && string === "Manufacture"),
+        };
+      }
+    }
+    setState(newState);
+  }
+
+  function checkPrivateKeyInput(
+    e: React.ChangeEvent<HTMLInputElement> &
+      React.KeyboardEvent<HTMLInputElement>,
+  ) {
+    e.preventDefault();
+
+    if (e.key === "Enter") {
+      e.preventDefault();
+      return;
+    }
+
+    const value = e.target.value;
+    console.log("value", value);
+    const cleanedValue = value.trim().replace(/[^a-zA-Z0-9]/g, "");
+    console.log("cleanedValue", cleanedValue);
+
+    if (cleanedValue.slice(0, 2) !== "0x" && cleanedValue.length !== 64) {
+      setPrivatekeyError(true);
+      setState(diabledButtonsState);
+    } else if (cleanedValue.length > 66) {
+      setPrivatekeyError(true);
+      setState(diabledButtonsState);
+    } else {
+      setPrivatekeyError(false);
+      setState(diabledButtonsState);
+    }
+
+    if (cleanedValue.length === 66) {
+      settingActivePhaseButton("Allocate Tokens");
+    }
+
+    console.log("cleanedValue", cleanedValue);
+    setValue(cleanedValue);
+  }
+
   return (
     <div
       className={cn(
-        "w-full h-screen bg-cover",
+        "w-full bg-cover",
         "flex flex-col items-center justify-center gap-[50px]",
         "px-[16px]",
       )}
     >
-      <ConnectButton />
+      <div
+        className={cn(
+          "grid grid-flow-col place-items-center gap-4",
+          account.isConnected && "grid-flow-row",
+        )}
+      >
+        <Input
+          placeholder="Enter Private Key : 0x"
+          className={cn(
+            "bg-white max-w-[400px] w-[66ch]",
+            privatekeyError && "border-red-500 text-red-500",
+          )}
+          value={value}
+          onChange={checkPrivateKeyInput}
+        />
+        <ConnectButton />
+      </div>
+      <div className="flex justify-center items-center gap-2">
+        <Button
+          type="button"
+          disabled={state["Allocate Tokens"].disabled}
+          variant={state["Allocate Tokens"].success ? "success" : "default"}
+          onClick={() => settingActivePhaseButton("Generate Proof")}
+          >
+          Allocate Tokens
+        </Button>
+        <Button
+          type="button"
+          disabled={state["Generate Proof"].disabled}
+          variant={state["Generate Proof"].success ? "success" : "default"}
+          onClick={() => settingActivePhaseButton("Manufacture")}
+        >
+          Generate Proof
+        </Button>
+        <Button
+          type="button"
+          disabled={state["Manufacture"].disabled}
+          variant={state["Manufacture"].success ? "success" : "default"}
+          onClick={() => settingActivePhaseButton("Manufacture")}
+        >
+          Manufacture
+        </Button>
+      </div>
     </div>
   );
 }

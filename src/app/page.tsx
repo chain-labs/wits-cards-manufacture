@@ -31,7 +31,6 @@ export default function Home() {
           selection: (
             <>
               <GetCardData />
-              <TableWithCardData />
               <Button
                 disabled={count <= 0}
                 onClick={() => {
@@ -46,6 +45,7 @@ export default function Home() {
           idle: <></>,
         }[state]
       }
+      <TableWithCardData />
     </div>
   );
 }

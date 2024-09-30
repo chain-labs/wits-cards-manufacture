@@ -29,6 +29,7 @@ function CardQuantity({ card }: { card: CardWithQuantity }) {
         size="sm"
         variant="secondary"
         disabled={card.quantity <= 1}
+        className="disabled:bg-slate-300"
       >
         -
       </Button>
