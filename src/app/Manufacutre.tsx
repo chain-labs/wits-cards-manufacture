@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSelectedCardsTable } from "@/store";
 import { cn } from "@/utils";
-import allocatingTokens from "@/utils/allocatingTokens";
+import AllocatingTokens from "@/utils/AllocatingTokens";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -66,7 +66,7 @@ export default function Manufacutre() {
   const [value, setValue] = useState<string>("");
   const [privatekeyError, setPrivatekeyError] = useState<boolean>(false);
   const account = useAccount();
-  const { list, updateDisable } = useSelectedCardsTable();
+  const { list, updateDisable, disableUpdate } = useSelectedCardsTable();
 
   useEffect(() => {
     if (state["Allocate Tokens"].success) {
@@ -152,18 +152,12 @@ export default function Manufacutre() {
           )}
           value={value}
           onChange={checkPrivateKeyInput}
+          disabled={disableUpdate}
         />
         <ConnectButton />
       </div>
       <div className="flex justify-center items-center gap-2">
-        <Button
-          type="button"
-          disabled={state["Allocate Tokens"].disabled}
-          variant={state["Allocate Tokens"].success ? "success" : "default"}
-          onClick={() => allocatingTokens(settingActivePhaseButton, list)}
-        >
-          Allocate Tokens
-        </Button>
+        <AllocatingTokens state={state} settingActivePhaseButton={settingActivePhaseButton} />
         <Button
           type="button"
           disabled={state["Generate Proof"].disabled}

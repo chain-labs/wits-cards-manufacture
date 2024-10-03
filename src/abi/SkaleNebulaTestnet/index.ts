@@ -2,7 +2,7 @@ import { skaleNebulaTestnet } from "viem/chains";
 
 interface IContract {
   address?: `0x${string}`;
-  abi?: any;
+  abi?: object[];
 }
 
 import abi from "./abi.json";
@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 
 const useSkaleNebulaTestnet = () => {
   const [contract, setContract] = useState<IContract>({
-    abi: {},
+    abi: [],
     address: zeroAddress,
   });
 
