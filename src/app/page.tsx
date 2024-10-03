@@ -7,7 +7,7 @@ import Button from "@/components/Button";
 import { useSelectedCardsTable } from "@/store";
 import GetCardData from "@/components/GetCardData";
 import TableWithCardData from "@/components/TableWithCardData";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Manufacutre from "./Manufacutre";
 
 type States = "selection" | "manufacture" | "idle";
@@ -15,6 +15,13 @@ type States = "selection" | "manufacture" | "idle";
 export default function Home() {
   const { count } = useSelectedCardsTable();
   const [state, setState] = useState<States>("selection");
+
+  useEffect(() => {
+    if (count === 0) {
+      setState("selection");
+    }
+  }, [count]);
+
   return (
     <div
       style={{

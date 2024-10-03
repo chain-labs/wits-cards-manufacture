@@ -2,12 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useSelectedCardsTable } from "@/store";
 import { cn } from "@/utils";
+import allocatingTokens from "@/utils/allocatingTokens";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
-type buttonStates = "Allocate Tokens" | "Generate Proof" | "Manufacture";
+export type buttonStates = "Allocate Tokens" | "Generate Proof" | "Manufacture";
 
 const diabledButtonsState: Record<
   buttonStates,
@@ -64,6 +66,15 @@ export default function Manufacutre() {
   const [value, setValue] = useState<string>("");
   const [privatekeyError, setPrivatekeyError] = useState<boolean>(false);
   const account = useAccount();
+  const { list, updateDisable } = useSelectedCardsTable();
+
+  useEffect(() => {
+    if (state["Allocate Tokens"].success) {
+      updateDisable(true);
+    } else {
+      updateDisable(false);
+    }
+  }, [state["Allocate Tokens"].success]);
 
   function settingActivePhaseButton(string: buttonStates) {
     const newState: typeof state = { ...state };
@@ -100,10 +111,7 @@ export default function Manufacutre() {
     }
 
     const value = e.target.value;
-    console.log("value", value);
     const cleanedValue = value.trim().replace(/[^a-zA-Z0-9]/g, "");
-    console.log("cleanedValue", cleanedValue);
-
     if (cleanedValue.slice(0, 2) !== "0x" && cleanedValue.length !== 64) {
       setPrivatekeyError(true);
       setState(diabledButtonsState);
@@ -119,7 +127,6 @@ export default function Manufacutre() {
       settingActivePhaseButton("Allocate Tokens");
     }
 
-    console.log("cleanedValue", cleanedValue);
     setValue(cleanedValue);
   }
 
@@ -153,8 +160,8 @@ export default function Manufacutre() {
           type="button"
           disabled={state["Allocate Tokens"].disabled}
           variant={state["Allocate Tokens"].success ? "success" : "default"}
-          onClick={() => settingActivePhaseButton("Generate Proof")}
-          >
+          onClick={() => allocatingTokens(settingActivePhaseButton, list)}
+        >
           Allocate Tokens
         </Button>
         <Button

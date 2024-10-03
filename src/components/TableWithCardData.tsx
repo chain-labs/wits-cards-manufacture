@@ -3,15 +3,20 @@ import Table from "./Table";
 import { CardWithQuantity } from "@/types";
 import { Button } from "./ui/button";
 
-function CardName({ card }: { card: CardWithQuantity }) {
+function CardName({
+  card,
+}: {
+  card: CardWithQuantity & { disabled: boolean };
+}) {
   const { removeCard } = useSelectedCardsTable();
   return (
     <p className="flex justify-center items-center gap-2">
       <Button
-        className="text-red-500"
+        className="text-red-500 disabled:bg-slate-300"
         onClick={() => removeCard(card)}
         size="sm"
         variant="secondary"
+        disabled={card.disabled}
       >
         x
       </Button>
@@ -20,7 +25,11 @@ function CardName({ card }: { card: CardWithQuantity }) {
   );
 }
 
-function CardQuantity({ card }: { card: CardWithQuantity }) {
+function CardQuantity({
+  card,
+}: {
+  card: CardWithQuantity & { disabled: boolean };
+}) {
   const { upadteCardQuantity } = useSelectedCardsTable();
   return (
     <div className="flex justify-center items-center gap-2 w-full">
@@ -28,7 +37,7 @@ function CardQuantity({ card }: { card: CardWithQuantity }) {
         onClick={() => upadteCardQuantity(card, card.quantity - 1)}
         size="sm"
         variant="secondary"
-        disabled={card.quantity <= 1}
+        disabled={card.quantity <= 1 || card.disabled}
         className="disabled:bg-slate-300"
       >
         -
@@ -38,6 +47,8 @@ function CardQuantity({ card }: { card: CardWithQuantity }) {
         onClick={() => upadteCardQuantity(card, card.quantity + 1)}
         size="sm"
         variant="secondary"
+        disabled={card.disabled}
+        className="disabled:bg-slate-300"
       >
         +
       </Button>
@@ -46,14 +57,17 @@ function CardQuantity({ card }: { card: CardWithQuantity }) {
 }
 
 export default function TableWithCardData() {
-  const { list } = useSelectedCardsTable();
+  const { list, disableUpdate } = useSelectedCardsTable();
 
   return (
     <Table
       header={["Name", "Quantity"]}
       body={list.map((card) => [
-        <CardName key={card.id} card={card} />,
-        <CardQuantity key={card.id} card={card} />,
+        <CardName key={card.id} card={{ ...card, disabled: disableUpdate }} />,
+        <CardQuantity
+          key={card.id}
+          card={{ ...card, disabled: disableUpdate }}
+        />,
       ])}
     />
   );

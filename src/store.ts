@@ -3,12 +3,14 @@
 import { create } from "zustand";
 import { CardWithQuantity } from "./types";
 
-type SelectedCardsTable = {
+export type SelectedCardsTable = {
   count: number;
   list: CardWithQuantity[];
   addCard: (card: CardWithQuantity) => void;
   removeCard: (card: CardWithQuantity) => void;
   upadteCardQuantity: (card: CardWithQuantity, quantity: number) => void;
+  disableUpdate: boolean;
+  updateDisable: (value: boolean) => void;
 };
 
 export const useSelectedCardsTable = create<SelectedCardsTable>((set) => ({
@@ -16,6 +18,7 @@ export const useSelectedCardsTable = create<SelectedCardsTable>((set) => ({
   list: [],
   addCard: (card: CardWithQuantity) => {
     set((state) => {
+      if (state.disableUpdate) return state;
       const isCardInTheList = state.list.some((c) => c.id === card.id);
       if (isCardInTheList === false) {
         return {
@@ -28,6 +31,7 @@ export const useSelectedCardsTable = create<SelectedCardsTable>((set) => ({
   },
   removeCard: (card) => {
     set((state) => {
+      if (state.disableUpdate) return state;
       const cardIndex = state.list.findIndex((c) => c.id === card.id);
       if (cardIndex !== -1) {
         const list = [...state.list];
@@ -42,6 +46,7 @@ export const useSelectedCardsTable = create<SelectedCardsTable>((set) => ({
   },
   upadteCardQuantity: (card, quantity) => {
     set((state) => {
+      if (state.disableUpdate) return state;
       const cardIndex = state.list.findIndex((c) => c.id === card.id);
       if (cardIndex !== -1) {
         const list = [...state.list];
@@ -53,5 +58,11 @@ export const useSelectedCardsTable = create<SelectedCardsTable>((set) => ({
       }
       return state;
     });
+  },
+  disableUpdate: false,
+  updateDisable: (value) => {
+    set(() => ({
+      disableUpdate: value,
+    }));
   },
 }));
