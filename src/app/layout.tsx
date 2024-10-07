@@ -4,6 +4,7 @@ import { beaufortPro } from "@/fonts";
 import { cn } from "@/utils";
 import "@rainbow-me/rainbowkit/styles.css";
 import RainbowKitContext from "@/RanbowKit";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "WITS Idle Game",
@@ -21,6 +22,7 @@ export default function RootLayout({
         <RainbowKitContext>
           <div id="modal" className="fixed z-50"></div>
           {children}
+          <Toaster/>
         </RainbowKitContext>
       </body>
     </html>
