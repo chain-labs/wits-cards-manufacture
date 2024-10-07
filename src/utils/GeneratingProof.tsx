@@ -6,6 +6,11 @@ import { Button } from "@/components/ui/button";
 import { useSelectedCardsTable } from "@/store";
 import { useEffect, useState } from "react";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { MerkleTree } from "merkletreejs";
+import { keccak256 } from "viem";
+import { CardWithQuantity } from "@/types";
+
+const buf2hex = (x: Buffer) => "0x" + x.toString("hex");
 
 export default function GeneratingProof({
   state,
@@ -22,7 +27,7 @@ export default function GeneratingProof({
   settingActivePhaseButton: (button: buttonStates) => void;
 }) {
   const {
-    writeContractAsync: allocateTokens,
+    writeContractAsync: updateMerkleRoot,
     data: hash,
     // error,
     // reset,
@@ -31,7 +36,15 @@ export default function GeneratingProof({
     hash: hash,
   });
   const SkaleNebulaTestnet = useSkaleNebulaTestnet();
-  const { count: cardsCount } = useSelectedCardsTable();
+  const {
+    list: cardInfos,
+    generatingProof,
+    allocatingTokensData,
+  } = useSelectedCardsTable() as {
+    list: CardWithQuantity[];
+    generatingProof: (data: unknown) => void;
+    allocatingTokensData: { CARD_STRUCT_HASH: string };
+  };
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -46,13 +59,28 @@ export default function GeneratingProof({
 
   async function handleGenerateProof() {
     setLoading(true);
-    await allocateTokens({
-      address: SkaleNebulaTestnet.address as `0x${string}`,
-      abi: SkaleNebulaTestnet.abi || [],
-      functionName: "allocateTokens",
-      args: [cardsCount],
-    });
-    setLoading(false);
+    try {
+      const CARD_STRUCT_HASH = allocatingTokensData.CARD_STRUCT_HASH;
+      const leaves = cardInfos.map((cardInfo) =>
+        generateLeaf(cardInfo, CARD_STRUCT_HASH, ethers),
+      );
+      const tree = new MerkleTree(leaves, keccak256, { sort: true });
+
+      const root = buf2hex(tree.getRoot());
+
+      const proofs = await updateMerkleRoot({
+        address: SkaleNebulaTestnet.address as `0x${string}`,
+        abi: SkaleNebulaTestnet.abi || [],
+        functionName: "updateMerkleRoot",
+        args: [root],
+      });
+
+      generatingProof({ proofs });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

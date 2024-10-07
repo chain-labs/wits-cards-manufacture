@@ -3,7 +3,7 @@ import "./globals.css";
 import { beaufortPro } from "@/fonts";
 import { cn } from "@/utils";
 import "@rainbow-me/rainbowkit/styles.css";
-import RainbowKitContext from "@/RanbowKit";
+import RainbowKitContext from "@/RainbowKit";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {

@@ -1,11 +1,11 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSelectedCardsTable } from "@/store";
 import { cn } from "@/utils";
 import AllocatingTokens from "@/utils/AllocatingTokens";
 import GeneratingProof from "@/utils/GeneratingProof";
+import ManufacturingCards from "@/utils/ManufacturingCards";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -67,7 +67,7 @@ export default function Manufacutre() {
   const [value, setValue] = useState<string>("");
   const [privatekeyError, setPrivatekeyError] = useState<boolean>(false);
   const account = useAccount();
-  const { list, updateDisable, disableUpdate } = useSelectedCardsTable();
+  const { updateDisable, disableUpdate } = useSelectedCardsTable();
 
   useEffect(() => {
     if (state["Allocate Tokens"].success) {
@@ -158,16 +158,19 @@ export default function Manufacutre() {
         <ConnectButton />
       </div>
       <div className="flex justify-center items-center gap-2">
-        <AllocatingTokens state={state} settingActivePhaseButton={settingActivePhaseButton} />
-        <GeneratingProof state={state} settingActivePhaseButton={settingActivePhaseButton} />
-        <Button
-          type="button"
-          disabled={state["Manufacture"].disabled}
-          variant={state["Manufacture"].success ? "success" : "default"}
-          onClick={() => settingActivePhaseButton("Manufacture")}
-        >
-          Manufacture
-        </Button>
+        <AllocatingTokens
+          state={state}
+          settingActivePhaseButton={settingActivePhaseButton}
+          privateKey={value as `0x${string}`}
+        />
+        <GeneratingProof
+          state={state}
+          settingActivePhaseButton={settingActivePhaseButton}
+        />
+        <ManufacturingCards
+          state={state}
+          settingActivePhaseButton={settingActivePhaseButton}
+        />
       </div>
     </div>
   );

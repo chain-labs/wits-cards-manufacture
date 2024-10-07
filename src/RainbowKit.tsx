@@ -21,7 +21,7 @@ export const config = getDefaultConfig({
 
 const RainbowKitContext = ({ children }: Props) => {
   return (
-    <WagmiProvider config={config} reconnectOnMount={true}>
+    <WagmiProvider config={config}>
       <QueryClientProvider client={client}>
         <RainbowKitProvider>{children}</RainbowKitProvider>
       </QueryClientProvider>

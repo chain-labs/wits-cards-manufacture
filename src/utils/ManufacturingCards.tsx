@@ -5,12 +5,15 @@ import { buttonStates } from "@/app/Manufacutre";
 import { Button } from "@/components/ui/button";
 import { useSelectedCardsTable } from "@/store";
 import { useEffect, useState } from "react";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import {
+  useAccount,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 
-export default function AllocatingTokens({
+export default function ManufacturingCards({
   state,
   settingActivePhaseButton,
-  privateKey,
 }: {
   state: Record<
     buttonStates,
@@ -21,20 +24,24 @@ export default function AllocatingTokens({
     }
   >;
   settingActivePhaseButton: (button: buttonStates) => void;
-  privateKey: `0x${string}`;
 }) {
   const {
-    writeContractAsync: allocateTokens,
+    writeContractAsync: claimCards,
     data: hash,
     // error,
     // reset,
   } = useWriteContract();
+
   const { data: receipt } = useWaitForTransactionReceipt({
     hash: hash,
   });
   const SkaleNebulaTestnet = useSkaleNebulaTestnet();
-  const { count: cardsCount, allocatingTokens } = useSelectedCardsTable();
+
+  const { list: cardClaimArray, generatingProofData } = useSelectedCardsTable();
+
   const [loading, setLoading] = useState(false);
+
+  const receiver = useAccount();
 
   useEffect(() => {
     console.log("hash", hash);
@@ -46,38 +53,41 @@ export default function AllocatingTokens({
     }
   }, [receipt]);
 
-  async function handleAllocateTokens() {
+  async function handleClaimCards() {
     setLoading(true);
     try {
-      const tokensData = await allocateTokens({
+      const claimTx = await claimCards({
         address: SkaleNebulaTestnet.address as `0x${string}`,
         abi: SkaleNebulaTestnet.abi || [],
-        functionName: "allocateTokens",
-        args: [cardsCount],
-        account: privateKey,
+        functionName: "claimCards",
+        args: [
+          receiver.address,
+          cardClaimArray,
+          generatingProofData.proof,
+          generatingProofData.signature,
+        ],
       });
-      allocatingTokens(tokensData);
+      console.log('claimTx', claimTx);
     } catch (err) {
-      console.log({ err });
-    } finally {
-      setLoading(false);
+      console.error({ err });
     }
+    setLoading(false);
   }
 
   return (
     <Button
       type="button"
-      disabled={state["Allocate Tokens"].disabled || loading}
+      disabled={state["Generate Proof"].disabled || loading}
       variant={
-        state["Allocate Tokens"].success
+        state["Generate Proof"].success
           ? "success"
           : loading
           ? "loading"
           : "default"
       }
-      onClick={handleAllocateTokens}
+      onClick={handleClaimCards}
     >
-      Allocate Tokens
+      Manufacting Cards
     </Button>
   );
 }

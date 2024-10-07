@@ -11,6 +11,12 @@ export type SelectedCardsTable = {
   upadteCardQuantity: (card: CardWithQuantity, quantity: number) => void;
   disableUpdate: boolean;
   updateDisable: (value: boolean) => void;
+  allocatingTokensData: unknown;
+  allocatingTokens: (data: unknown) => void;
+  generatingProofData: unknown;
+  generatingProof: (data: unknown) => void;
+  manufacturingCardsData: unknown;
+  manufacturingCards: (data: unknown) => void;
 };
 
 export const useSelectedCardsTable = create<SelectedCardsTable>((set) => ({
@@ -63,6 +69,24 @@ export const useSelectedCardsTable = create<SelectedCardsTable>((set) => ({
   updateDisable: (value) => {
     set(() => ({
       disableUpdate: value,
+    }));
+  },
+  allocatingTokensData: undefined,
+  allocatingTokens: (data) => {
+    set(() => ({
+      allocatingTokensData: data,
+    }));
+  },
+  generatingProofData: undefined,
+  generatingProof: (data) => {
+    set(() => ({
+      generatingProofData: data,
+    }));
+  },
+  manufacturingCardsData: undefined,
+  manufacturingCards: (data) => {
+    set(() => ({
+      manufacturingCardsData: data,
     }));
   },
 }));
