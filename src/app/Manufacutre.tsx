@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useSelectedCardsTable } from "@/store";
 import { cn } from "@/utils";
 import AllocatingTokens from "@/utils/AllocatingTokens";
+import GeneratingProof from "@/utils/GeneratingProof";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -158,14 +159,7 @@ export default function Manufacutre() {
       </div>
       <div className="flex justify-center items-center gap-2">
         <AllocatingTokens state={state} settingActivePhaseButton={settingActivePhaseButton} />
-        <Button
-          type="button"
-          disabled={state["Generate Proof"].disabled}
-          variant={state["Generate Proof"].success ? "success" : "default"}
-          onClick={() => settingActivePhaseButton("Manufacture")}
-        >
-          Generate Proof
-        </Button>
+        <GeneratingProof state={state} settingActivePhaseButton={settingActivePhaseButton} />
         <Button
           type="button"
           disabled={state["Manufacture"].disabled}

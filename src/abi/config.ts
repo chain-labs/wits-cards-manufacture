@@ -3,5 +3,5 @@ import { skaleNebulaTestnet } from "viem/chains";
 type Address = `0x${string}`;
 
 export const CONTRACTS: Record<number, Address> = {
-  [skaleNebulaTestnet.id]: "0x049D67388852DE0Cef5E1C4FdC91096cDc0a38dF",
+  [skaleNebulaTestnet.id]: "0x650A08cc7BafD06C4c16D8dbb0eE755aD7480Bf9",
 };

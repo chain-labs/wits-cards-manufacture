@@ -5,17 +5,11 @@ import { buttonStates } from "@/app/Manufacutre";
 import { Button } from "@/components/ui/button";
 import { useSelectedCardsTable } from "@/store";
 import { useEffect, useState } from "react";
-import { forma } from "viem/chains";
-import {
-  createConfig,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
-export default function AllocatingTokens({
+export default function GeneratingProof({
   state,
   settingActivePhaseButton,
-  privateKey,
 }: {
   state: Record<
     buttonStates,
@@ -26,7 +20,6 @@ export default function AllocatingTokens({
     }
   >;
   settingActivePhaseButton: (button: buttonStates) => void;
-  privateKey: `0x${string}`;
 }) {
   const {
     writeContractAsync: allocateTokens,
@@ -51,10 +44,10 @@ export default function AllocatingTokens({
     }
   }, [receipt]);
 
-  async function handleAllocateTokens() {
+  async function handleGenerateProof() {
     setLoading(true);
     await allocateTokens({
-      address: SkaleNebulaTestnet.address as `0x${string}`, //0x650A08cc7BafD06C4c16D8dbb0eE755aD7480Bf9
+      address: SkaleNebulaTestnet.address as `0x${string}`,
       abi: SkaleNebulaTestnet.abi || [],
       functionName: "allocateTokens",
       args: [cardsCount],
@@ -65,17 +58,17 @@ export default function AllocatingTokens({
   return (
     <Button
       type="button"
-      disabled={state["Allocate Tokens"].disabled || loading}
+      disabled={state["Generate Proof"].disabled || loading}
       variant={
-        state["Allocate Tokens"].success
+        state["Generate Proof"].success
           ? "success"
           : loading
           ? "loading"
           : "default"
       }
-      onClick={handleAllocateTokens}
+      onClick={handleGenerateProof}
     >
-      Allocate Tokens
+      Generate Proof
     </Button>
   );
 }

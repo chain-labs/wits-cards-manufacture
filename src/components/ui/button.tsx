@@ -22,6 +22,7 @@ const buttonVariants = cva(
         success:
           "bg-green-500 text-black shadow-sm hover:bg-green-500/90 disabled:bg-green-500",
         error: "bg-red-500 text-black shadow-sm hover:bg-red-500/90",
+        loading: "bg-primary text-primary-foreground shadow user-select-none",
       },
       size: {
         default: "h-9 px-4 py-2",
