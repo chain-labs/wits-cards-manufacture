@@ -45,7 +45,7 @@ export default function Manufacutre() {
         active: boolean;
         disabled: boolean;
         success: boolean;
-      }
+      } 
     >
   >({
     "Allocate Tokens": {
