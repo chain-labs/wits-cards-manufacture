@@ -47,8 +47,8 @@ Button({
             y2="58.9839"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stop-color="#FFFED0" />
-            <stop offset="1" stop-color="#EFC779" />
+            <stop stopColor="#FFFED0" />
+            <stop offset="1" stopColor="#EFC779" />
           </linearGradient>
         </defs>
       </svg>

@@ -3,17 +3,20 @@
 import useSkaleNebulaTestnet from "@/abi/SkaleNebulaTestnet";
 import { buttonStates } from "@/app/Manufacutre";
 import { Button } from "@/components/ui/button";
+import { Skalatestnet_provider } from "@/constants";
 import { useSelectedCardsTable } from "@/store";
+import { ethers } from "ethers";
 import { useEffect, useState } from "react";
-import {
-  useAccount,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+// import {
+//   useAccount,
+//   useWaitForTransactionReceipt,
+//   useWriteContract,
+// } from "wagmi";
 
 export default function ManufacturingCards({
   state,
   settingActivePhaseButton,
+  privateKey,
 }: {
   state: Record<
     buttonStates,
@@ -24,28 +27,31 @@ export default function ManufacturingCards({
     }
   >;
   settingActivePhaseButton: (button: buttonStates) => void;
+  privateKey: `0x${string}`;
 }) {
-  const {
-    writeContractAsync: claimCards,
-    data: hash,
-    // error,
-    // reset,
-  } = useWriteContract();
+  // const {
+  //   writeContractAsync: claimCards,
+  //   data: hash,
+  //   // error,
+  //   // reset,
+  // } = useWriteContract();
 
-  const { data: receipt } = useWaitForTransactionReceipt({
-    hash: hash,
-  });
+  // const { data: receipt } = useWaitForTransactionReceipt({
+  //   hash: hash,
+  // });
   const SkaleNebulaTestnet = useSkaleNebulaTestnet();
 
-  const { list: cardClaimArray, generatingProofData } = useSelectedCardsTable();
+  const { generatingProofData } = useSelectedCardsTable() as {
+    generatingProofData: {
+      tree: { getHexProof: (leaf: string) => string[] };
+      leaves: string[];
+      cardInfos: unknown[];
+      signatures: string[];
+    };
+  };
 
   const [loading, setLoading] = useState(false);
-
-  const receiver = useAccount();
-
-  useEffect(() => {
-    console.log("hash", hash);
-  }, [hash]);
+  const [receipt, setReceipt] = useState<unknown>();
 
   useEffect(() => {
     if (receipt) {
@@ -56,22 +62,55 @@ export default function ManufacturingCards({
   async function handleClaimCards() {
     setLoading(true);
     try {
-      const claimTx = await claimCards({
-        address: SkaleNebulaTestnet.address as `0x${string}`,
-        abi: SkaleNebulaTestnet.abi || [],
-        functionName: "claimCards",
-        args: [
-          receiver.address,
-          cardClaimArray,
-          generatingProofData.proof,
-          generatingProofData.signature,
-        ],
+      // TODO: change this to the receiver's address
+      const receiver = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+
+      const provider = ethers.getDefaultProvider(Skalatestnet_provider);
+
+      const userWalletWithProvider = new ethers.Wallet(privateKey, provider);
+
+      const contract = new ethers.Contract(
+        SkaleNebulaTestnet.address ?? "0x",
+        SkaleNebulaTestnet.abi ?? [],
+        userWalletWithProvider,
+      );
+
+      const proofs = generatingProofData.tree.getHexProof(
+        generatingProofData.leaves[0],
+      );
+      const cardClaimArray = [generatingProofData.cardInfos[0]];
+      const claimProofsArray = [proofs];
+      const claimSignatureArray = [generatingProofData.signatures[0]];
+
+      console.log({
+        receiver,
+        cardClaimArray,
+        claimProofsArray,
+        claimSignatureArray,
       });
-      console.log('claimTx', claimTx);
+      console.log("Working till here...");
+      const claimTx = await contract.claimCards.send(
+        receiver,
+        cardClaimArray,
+        claimProofsArray,
+        claimSignatureArray,
+        { gasLimit: 150000 },
+      );
+      console.log("Waiting for claiming cards trx with hash:", claimTx.hash);
+      await claimTx.wait();
+      console.log("Cards with token ID 1 claimed successfully");
+
+      setReceipt(claimTx);
     } catch (err) {
       console.error({ err });
     }
     setLoading(false);
+    /**
+     * 
+     *  generate signature
+  const signaturePromises: Promise<BytesLike>[] = cardInfos.map(cardInfo => generateSignature(uc_name, uc_version, uc_chain_id, uc_address, cardInfo, pk1, ethers));
+  const signatures = await Promise.all(signaturePromises);
+     */
   }
 
   return (

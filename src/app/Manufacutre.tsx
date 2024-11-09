@@ -12,6 +12,8 @@ import { useAccount } from "wagmi";
 
 export type buttonStates = "Allocate Tokens" | "Generate Proof" | "Manufacture";
 
+const MAX_ADDRESS_LENGTH = 66;
+
 const diabledButtonsState: Record<
   buttonStates,
   {
@@ -113,10 +115,10 @@ export default function Manufacutre() {
 
     const value = e.target.value;
     const cleanedValue = value.trim().replace(/[^a-zA-Z0-9]/g, "");
-    if (cleanedValue.slice(0, 2) !== "0x" && cleanedValue.length !== 64) {
+    if (cleanedValue.slice(0, 2) !== "0x" && cleanedValue.length !== MAX_ADDRESS_LENGTH) {
       setPrivatekeyError(true);
       setState(diabledButtonsState);
-    } else if (cleanedValue.length > 66) {
+    } else if (cleanedValue.length > MAX_ADDRESS_LENGTH) {
       setPrivatekeyError(true);
       setState(diabledButtonsState);
     } else {
@@ -124,7 +126,7 @@ export default function Manufacutre() {
       setState(diabledButtonsState);
     }
 
-    if (cleanedValue.length === 66) {
+    if (cleanedValue.length === MAX_ADDRESS_LENGTH) {
       settingActivePhaseButton("Allocate Tokens");
     }
 

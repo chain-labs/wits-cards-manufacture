@@ -5,7 +5,9 @@ import { buttonStates } from "@/app/Manufacutre";
 import { Button } from "@/components/ui/button";
 import { useSelectedCardsTable } from "@/store";
 import { useEffect, useState } from "react";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+// import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { ethers } from "ethers";
+import { Skalatestnet_provider } from "@/constants";
 
 export default function AllocatingTokens({
   state,
@@ -23,22 +25,14 @@ export default function AllocatingTokens({
   settingActivePhaseButton: (button: buttonStates) => void;
   privateKey: `0x${string}`;
 }) {
-  const {
-    writeContractAsync: allocateTokens,
-    data: hash,
-    // error,
-    // reset,
-  } = useWriteContract();
-  const { data: receipt } = useWaitForTransactionReceipt({
-    hash: hash,
-  });
+  // const { writeContractAsync: allocateTokens, data: hash } = useWriteContract();
+  // const { data: receipt } = useWaitForTransactionReceipt({
+  //   hash: hash,
+  // });
   const SkaleNebulaTestnet = useSkaleNebulaTestnet();
-  const { count: cardsCount, allocatingTokens } = useSelectedCardsTable();
+  const { count: cardsCount } = useSelectedCardsTable();
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    console.log("hash", hash);
-  }, [hash]);
+  const [receipt, setReceipt] = useState();
 
   useEffect(() => {
     if (receipt) {
@@ -49,14 +43,31 @@ export default function AllocatingTokens({
   async function handleAllocateTokens() {
     setLoading(true);
     try {
-      const tokensData = await allocateTokens({
-        address: SkaleNebulaTestnet.address as `0x${string}`,
-        abi: SkaleNebulaTestnet.abi || [],
-        functionName: "allocateTokens",
-        args: [cardsCount],
-        account: privateKey,
-      });
-      allocatingTokens(tokensData);
+      // const tokensData = await allocateTokens({
+      //   address: SkaleNebulaTestnet.address as `0x${string}`,
+      //   abi: SkaleNebulaTestnet.abi || [],
+      //   functionName: "allocateTokens",
+      //   args: [cardsCount],
+      //   account: privateKey,
+      // });
+      // allocatingTokens(tokensData);
+
+      const provider = ethers.getDefaultProvider(Skalatestnet_provider);
+
+      const userWalletWithProvider = new ethers.Wallet(privateKey, provider);
+
+      const contract = new ethers.Contract(
+        SkaleNebulaTestnet.address ?? "0x",
+        SkaleNebulaTestnet.abi ?? [],
+        userWalletWithProvider
+      );
+
+      console.log("allocating tokens...");
+      const tx = await contract.allocateTokens(cardsCount);
+      console.log("Waiting for Allocating tokens trx with hash:", tx);
+      const receipt = await tx.wait();
+      console.log("Tokens allocated successfully", receipt);
+      setReceipt(receipt);
     } catch (err) {
       console.log({ err });
     } finally {
