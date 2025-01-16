@@ -12,6 +12,7 @@ import { CardWithQuantity } from "@/types";
 import { BytesLike, ethers } from "ethers";
 import { Skalatestnet_provider } from "@/constants";
 import { useAccount } from "wagmi";
+import toast from "react-hot-toast";
 
 const buf2hex = (x: Buffer) => "0x" + x.toString("hex");
 
@@ -42,10 +43,11 @@ function generateLeaf(
   },
   CARD_STRUCT_HASH: string,
 ) {
+  console.log("card", card);
   return keccak256(
     // @ts-expect-error - The types are not correct
     ethers.AbiCoder.defaultAbiCoder().encode(
-      ["bytes32", "uint256", "uint256", "uint8", "bytes32", "bytes32"],
+      ["bytes32", "uint256", "uint256", "string", "bytes32", "bytes32"],
       [
         CARD_STRUCT_HASH,
         card.id,
@@ -77,7 +79,7 @@ async function generateSignature(
       CardInfo: [
         { name: "assignedTokenId", type: "uint256" },
         { name: "uniqueCode", type: "uint16" },
-        { name: "rarity", type: "uint8" },
+        { name: "rarity", type: "string" },
         { name: "name", type: "string" },
         { name: "faction", type: "string" },
       ],
@@ -186,7 +188,7 @@ export default function GeneratingProof({
   } = useSelectedCardsTable() as {
     list: CardWithQuantity[];
     generatingProof: (data: unknown) => void;
-    allocatingTokensData: { CARD_STRUCT_HASH: string };
+    allocatingTokensData: { hash: string };
   };
   const [loading, setLoading] = useState(false);
   const [receipt, setReceipt] = useState<unknown>();
@@ -195,6 +197,7 @@ export default function GeneratingProof({
   // Effect to set the active phase button when receipt is available
   useEffect(() => {
     if (receipt) {
+      toast.success("Proof generated successfully");
       settingActivePhaseButton("Manufacture");
     }
   }, [receipt]);
@@ -206,6 +209,7 @@ export default function GeneratingProof({
     setLoading(true);
     try {
       const provider = ethers.getDefaultProvider(Skalatestnet_provider);
+      console.log("provider", provider);
 
       const userWalletWithProvider = new ethers.Wallet(privateKey, provider);
 
@@ -215,7 +219,10 @@ export default function GeneratingProof({
         userWalletWithProvider,
       );
 
-      const CARD_STRUCT_HASH = allocatingTokensData.CARD_STRUCT_HASH;
+      const CARD_STRUCT_HASH = allocatingTokensData.hash;
+      console.log("CARD_STRUCT_HASH", CARD_STRUCT_HASH);
+
+      console.log("cardInfos", cardInfos);
 
       // TODO: add previous proof to the tree
       const leaves = cardInfos.map((cardInfo) =>
@@ -225,11 +232,14 @@ export default function GeneratingProof({
             uniqueCode: cardInfo.id,
             rarity: cardInfo.rarity,
             tid: cardInfo.tid,
-            faction: cardInfo.alliance,
+            faction: cardInfo.team,
           },
           CARD_STRUCT_HASH,
         ),
       );
+
+      console.log("leaves", leaves);
+
       const tree = new MerkleTree(leaves, keccak256, { sortPairs: true });
 
       const root = buf2hex(tree.getRoot());
@@ -266,7 +276,7 @@ export default function GeneratingProof({
               uniqueCode: cardInfo.id,
               rarity: cardInfo.rarity,
               name: cardInfo.tid,
-              faction: cardInfo.alliance,
+              faction: cardInfo.team,
             },
             userWalletWithProvider,
           ),

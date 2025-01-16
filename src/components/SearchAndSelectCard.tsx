@@ -56,9 +56,9 @@ export function SearchAndSelectCard({
           <CommandList>
             <CommandEmpty>{emptyListMessage}</CommandEmpty>
             <CommandGroup>
-              {list.map((l) => (
+              {list.map((l, idx) => (
                 <CommandItem
-                  key={l.id}
+                  key={idx}
                   value={l.tid}
                   onSelect={(currentValue) => {
                     const selectedCard = list.find((card) => card.tid === currentValue) || null;

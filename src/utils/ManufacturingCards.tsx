@@ -5,8 +5,10 @@ import { buttonStates } from "@/app/Manufacutre";
 import { Button } from "@/components/ui/button";
 import { Skalatestnet_provider } from "@/constants";
 import { useSelectedCardsTable } from "@/store";
+import { CardWithQuantity } from "@/types";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 // import {
 //   useAccount,
 //   useWaitForTransactionReceipt,
@@ -55,6 +57,7 @@ export default function ManufacturingCards({
 
   useEffect(() => {
     if (receipt) {
+      toast.success("Done");
       settingActivePhaseButton("Allocate Tokens");
     }
   }, [receipt]);
@@ -78,7 +81,16 @@ export default function ManufacturingCards({
       const proofs = generatingProofData.tree.getHexProof(
         generatingProofData.leaves[0],
       );
-      const cardClaimArray = [generatingProofData.cardInfos[0]];
+      const cardClaimArray = [generatingProofData.cardInfos[0]].map((e: unknown) => {
+        const card = e as CardWithQuantity;
+        return {
+          ...card,
+          assignedTokenId: card.id,
+          uniqueCode: card.id,
+          name: card.tid,
+          faction: card.team,
+        };
+      });
       const claimProofsArray = [proofs];
       const claimSignatureArray = [generatingProofData.signatures[0]];
 
@@ -98,7 +110,7 @@ export default function ManufacturingCards({
       );
       console.log("Waiting for claiming cards trx with hash:", claimTx.hash);
       await claimTx.wait();
-      console.log("Cards with token ID 1 claimed successfully");
+      console.log("Cards with token ID 1 claimed successfully", claimTx);
 
       setReceipt(claimTx);
     } catch (err) {
@@ -116,9 +128,9 @@ export default function ManufacturingCards({
   return (
     <Button
       type="button"
-      disabled={state["Generate Proof"].disabled || loading}
+      disabled={state["Manufacture"].disabled || loading}
       variant={
-        state["Generate Proof"].success
+        state["Manufacture"].success
           ? "success"
           : loading
           ? "loading"

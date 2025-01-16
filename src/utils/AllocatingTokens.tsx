@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 // import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { ethers } from "ethers";
 import { Skalatestnet_provider } from "@/constants";
+import toast from "react-hot-toast";
 
 export default function AllocatingTokens({
   state,
@@ -30,13 +31,15 @@ export default function AllocatingTokens({
   //   hash: hash,
   // });
   const SkaleNebulaTestnet = useSkaleNebulaTestnet();
-  const { count: cardsCount } = useSelectedCardsTable();
+  const { count: cardsCount, allocatingTokens } = useSelectedCardsTable();
   const [loading, setLoading] = useState(false);
   const [receipt, setReceipt] = useState();
 
   useEffect(() => {
     if (receipt) {
-      settingActivePhaseButton("Allocate Tokens");
+      toast.success("Tokens allocated successfully");
+      settingActivePhaseButton("Generate Proof");
+      allocatingTokens(receipt);
     }
   }, [receipt]);
 

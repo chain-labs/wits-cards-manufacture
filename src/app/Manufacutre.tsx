@@ -167,9 +167,11 @@ export default function Manufacutre() {
         />
         <GeneratingProof
           state={state}
+          privateKey={value as `0x${string}`}
           settingActivePhaseButton={settingActivePhaseButton}
         />
         <ManufacturingCards
+          privateKey={value as `0x${string}`}
           state={state}
           settingActivePhaseButton={settingActivePhaseButton}
         />

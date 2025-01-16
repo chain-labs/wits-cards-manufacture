@@ -11,6 +11,8 @@ export interface Card {
   hp: number;
   cost: number;
   packs: string[];
+  team: string;
+  supply: number;
 }
 
 export type CardWithQuantity = {
