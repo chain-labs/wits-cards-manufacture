@@ -3,7 +3,7 @@
 import useAbstractTestnet from "@/abi/AbstractTestnet";
 import { buttonStates } from "@/app/Manufacutre";
 import { Button } from "@/components/ui/button";
-import { useSelectedCardsTable } from "@/store";
+import { useJSONCards, useSelectedCardsTable } from "@/store";
 import { useEffect, useState } from "react";
 // import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { ethers } from "ethers";
@@ -32,6 +32,7 @@ export default function AllocatingTokens({
   // });
   const AbstractTestnet = useAbstractTestnet();
   const { count: cardsCount, allocatingTokens } = useSelectedCardsTable();
+  const { jsonCardsCount } = useJSONCards();
   const [loading, setLoading] = useState(false);
   const [receipt, setReceipt] = useState();
 
@@ -62,11 +63,11 @@ export default function AllocatingTokens({
       const contract = new ethers.Contract(
         AbstractTestnet.address ?? "0x",
         AbstractTestnet.abi ?? [],
-        userWalletWithProvider
+        userWalletWithProvider,
       );
 
       console.log("allocating tokens...");
-      const tx = await contract.allocateTokens(cardsCount);
+      const tx = await contract.allocateTokens(cardsCount + jsonCardsCount);
       console.log("Waiting for Allocating tokens trx with hash:", tx);
       const receipt = await tx.wait();
       console.log("Tokens allocated successfully", receipt);

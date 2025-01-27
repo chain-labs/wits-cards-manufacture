@@ -3,7 +3,7 @@
 import useSkaleNebulaTestnet from "@/abi/AbstractTestnet";
 import { buttonStates } from "@/app/Manufacutre";
 import { Button } from "@/components/ui/button";
-import { useSelectedCardsTable } from "@/store";
+import { JsonData, useJSONCards, useSelectedCardsTable } from "@/store";
 import { useEffect, useState } from "react";
 // import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { MerkleTree } from "merkletreejs";
@@ -123,21 +123,28 @@ function saveArraysToJSON(
   chainId: number,
   array1: unknown[],
   array2: unknown[],
+  rawJSONdata: JsonData,
+  updateRawJSONData: (data: JsonData) => void,
 ): void {
   const data = {
+    ...rawJSONdata,
     [parseInt(chainId.toString())]: {
       data: array1,
       claimLinks: array2,
     },
   };
 
+  updateRawJSONData(data);
   console.log(data);
 
   // fs.writeFileSync(filename, JSON.stringify(data, null, 2));
   // store in local storage with BigInt handling
-  localStorage.setItem("claimCards", JSON.stringify(data, (_, value) =>
-    typeof value === 'bigint' ? value.toString() : value
-  ));
+  localStorage.setItem(
+    "claimCards",
+    JSON.stringify(data, (_, value) =>
+      typeof value === "bigint" ? value.toString() : value,
+    ),
+  );
 }
 
 /**
@@ -169,7 +176,7 @@ export default function GeneratingProof({
   // State and hooks initialization
   const SkaleNebulaTestnet = useSkaleNebulaTestnet();
   const {
-    cards: cardInfos,
+    cards: cardInfosFromStore,
     generatingProof,
     allocatingTokensData,
   } = useSelectedCardsTable() as {
@@ -177,6 +184,7 @@ export default function GeneratingProof({
     generatingProof: (data: unknown) => void;
     allocatingTokensData: { hash: string };
   };
+  const { jsonCardsInfo, rawJSONdata, updateRawJSONData } = useJSONCards();
   const [loading, setLoading] = useState(false);
   const [receipt, setReceipt] = useState<unknown>();
   const { chainId } = useAccount();
@@ -195,6 +203,9 @@ export default function GeneratingProof({
   async function handleGenerateProof() {
     setLoading(true);
     try {
+      // necessary to add previous data to the tree
+      const cardInfos = jsonCardsInfo.concat(cardInfosFromStore);
+
       const provider = ethers.getDefaultProvider(Abstracttestnet_provider);
       console.log("provider", provider);
 
@@ -281,7 +292,13 @@ export default function GeneratingProof({
       console.log(uc_chain_id, data, links);
 
       // Save data and links to JSON
-      saveArraysToJSON(uc_chain_id, data, links);
+      saveArraysToJSON(
+        uc_chain_id,
+        data,
+        links,
+        rawJSONdata,
+        updateRawJSONData,
+      );
 
       setReceipt(true);
     } catch (err) {

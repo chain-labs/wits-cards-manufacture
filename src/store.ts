@@ -187,21 +187,39 @@ export const useSelectedCardsTable = create<SelectedCardsTable>((set) => ({
   },
 }));
 
+export interface ClaimData {
+  data: {
+    cardHash: string;
+    cardInfo: CardInfo;
+  }[];
+  claimLinks: string[];
+}
+
+export interface JsonData {
+  // Define your expected data structure here
+  [key: string]: ClaimData;
+}
 
 type JSONCardsState = {
+  jsonCardsCount: number;
   jsonCards: CardWithQuantity[];
   jsonCardsInfo: CardInfo[];
+  rawJSONdata: JsonData;
   addJSONCardInfo: (card: CardInfo) => void;
   addJSONCard: (card: CardWithQuantity) => void;
   updateJSONCardQuantity: (card: CardWithQuantity, quantity: number) => void;
+  updateRawJSONData: (data: JsonData) => void;
 };
 
 export const useJSONCards = create<JSONCardsState>((set) => ({
+  jsonCardsCount: 0,
   jsonCards: [],
   jsonCardsInfo: [],
+  rawJSONdata: {},
   addJSONCardInfo: (card) => {
     set((state) => ({
-      jsonCardsInfo: [...state.jsonCardsInfo, card]
+      jsonCardsInfo: [...state.jsonCardsInfo, card],
+      jsonCardsCount: state.jsonCardsCount + 1,
     }));
   },
   addJSONCard: (card) => {
@@ -209,7 +227,8 @@ export const useJSONCards = create<JSONCardsState>((set) => ({
       const exists = state.jsonCards.some((c) => c.id === card.id);
       if (!exists) {
         return {
-          jsonCards: [...state.jsonCards, card]
+          jsonCards: [...state.jsonCards, card],
+          jsonCardsCount: state.jsonCardsCount + card.quantity,
         };
       }
       return state;
@@ -222,10 +241,16 @@ export const useJSONCards = create<JSONCardsState>((set) => ({
         const updatedCards = [...state.jsonCards];
         updatedCards[cardIndex] = { ...card, quantity };
         return {
-          jsonCards: updatedCards
+          jsonCards: updatedCards,
+          jsonCardsCount: state.jsonCardsCount + quantity - card.quantity,
         };
       }
       return state;
     });
-  }
+  },
+  updateRawJSONData: (data) => {
+    set(() => ({
+      rawJSONdata: data,
+    }));
+  },
 }));

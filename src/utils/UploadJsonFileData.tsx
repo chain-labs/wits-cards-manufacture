@@ -1,21 +1,7 @@
 import { Input } from "@/components/ui/input";
-import { useJSONCards } from "@/store";
+import { ClaimData, JsonData, useJSONCards } from "@/store";
 import useCards from "@/hooks/useCards";
-import { CardInfo } from "@/types";
 import React, { useState } from "react";
-
-interface ClaimData {
-  data: {
-    cardHash: string;
-    cardInfo: CardInfo;
-  }[];
-  claimLinks: string[];
-}
-
-interface JsonData {
-  // Define your expected data structure here
-  [key: string]: ClaimData;
-}
 
 export default function UploadJsonFileData({
   jsonFileStatus,
@@ -25,8 +11,12 @@ export default function UploadJsonFileData({
   setJsonFileStatus: (status: boolean) => void;
 }) {
   const [error, setError] = useState<string | null>(null);
-  const { addJSONCardInfo, addJSONCard, updateJSONCardQuantity } =
-    useJSONCards();
+  const {
+    addJSONCardInfo,
+    addJSONCard,
+    updateJSONCardQuantity,
+    updateRawJSONData,
+  } = useJSONCards();
   const cardsData = useCards();
 
   const validateJsonFormat = (data: unknown): data is JsonData => {
@@ -91,6 +81,7 @@ export default function UploadJsonFileData({
       try {
         const parsedData = JSON.parse(e.target?.result as string);
         if (validateJsonFormat(parsedData)) {
+          updateRawJSONData(parsedData);
           handleCardsUpload(parsedData);
           setError(null);
           setJsonFileStatus(true);
