@@ -5,11 +5,10 @@ import { useSelectedCardsTable } from "@/store";
 import { cn } from "@/utils";
 import AllocatingTokens from "@/utils/AllocatingTokens";
 import GeneratingProof from "@/utils/GeneratingProof";
-import ManufacturingCards from "@/utils/ManufacturingCards";
+import UploadingCards from "@/utils/UploadingCards";
 import { useEffect, useState } from "react";
-import { useAccount } from "wagmi";
 
-export type buttonStates = "Allocate Tokens" | "Generate Proof" | "Manufacture";
+export type buttonStates = "Allocate Tokens" | "Generate Proof" | "Uploading";
 
 const MAX_ADDRESS_LENGTH = 66;
 
@@ -31,7 +30,7 @@ const diabledButtonsState: Record<
     disabled: true,
     success: false,
   },
-  Manufacture: {
+  Uploading: {
     active: false,
     disabled: true,
     success: false,
@@ -46,7 +45,7 @@ export default function Manufacutre() {
         active: boolean;
         disabled: boolean;
         success: boolean;
-      } 
+      }
     >
   >({
     "Allocate Tokens": {
@@ -59,7 +58,7 @@ export default function Manufacutre() {
       disabled: true,
       success: false,
     },
-    Manufacture: {
+    Uploading: {
       active: false,
       disabled: true,
       success: false,
@@ -67,7 +66,6 @@ export default function Manufacutre() {
   });
   const [value, setValue] = useState<string>("");
   const [privatekeyError, setPrivatekeyError] = useState<boolean>(false);
-  const account = useAccount();
   const { updateDisable, disableUpdate } = useSelectedCardsTable();
 
   useEffect(() => {
@@ -93,8 +91,8 @@ export default function Manufacutre() {
           disabled: true,
           success:
             (key === "Allocate Tokens" &&
-              (string === "Generate Proof" || string === "Manufacture")) ||
-            (key === "Generate Proof" && string === "Manufacture"),
+              (string === "Generate Proof" || string === "Uploading")) ||
+            (key === "Generate Proof" && string === "Uploading"),
         };
       }
     }
@@ -114,7 +112,10 @@ export default function Manufacutre() {
 
     const value = e.target.value;
     const cleanedValue = value.trim().replace(/[^a-zA-Z0-9]/g, "");
-    if (cleanedValue.slice(0, 2) !== "0x" && cleanedValue.length !== MAX_ADDRESS_LENGTH) {
+    if (
+      cleanedValue.slice(0, 2) !== "0x" &&
+      cleanedValue.length !== MAX_ADDRESS_LENGTH
+    ) {
       setPrivatekeyError(true);
       setState(diabledButtonsState);
     } else if (cleanedValue.length > MAX_ADDRESS_LENGTH) {
@@ -140,12 +141,7 @@ export default function Manufacutre() {
         "px-[16px]",
       )}
     >
-      <div
-        className={cn(
-          "grid grid-flow-col place-items-center gap-4",
-          account.isConnected && "grid-flow-row",
-        )}
-      >
+      <div className={cn("grid grid-flow-col place-items-center gap-4")}>
         <Input
           placeholder="Enter Private Key : 0x"
           className={cn(
@@ -156,7 +152,6 @@ export default function Manufacutre() {
           onChange={checkPrivateKeyInput}
           disabled={disableUpdate}
         />
-        
       </div>
       <div className="flex justify-center items-center gap-2">
         <AllocatingTokens
@@ -169,7 +164,7 @@ export default function Manufacutre() {
           privateKey={value as `0x${string}`}
           settingActivePhaseButton={settingActivePhaseButton}
         />
-        <ManufacturingCards
+        <UploadingCards
           privateKey={value as `0x${string}`}
           state={state}
           settingActivePhaseButton={settingActivePhaseButton}

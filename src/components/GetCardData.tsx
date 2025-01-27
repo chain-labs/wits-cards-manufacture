@@ -14,7 +14,8 @@ import {
 } from "@/constants";
 import { ethers } from "ethers";
 import useAbstractTestnet from "@/abi/AbstractTestnet";
-import UploadJsonFileData from "@/utils/UploadJsonFileData";
+// import UploadJsonFileData from "@/utils/UploadJsonFileData";
+import DownloadJsonFileData from "@/utils/DownloadJsonFileData";
 
 export default function GetCardData() {
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
@@ -101,7 +102,13 @@ export default function GetCardData() {
       className="flex justify-center items-center gap-[24px]"
     >
       {/* upload file */}
-      <UploadJsonFileData
+      {/* <UploadJsonFileData
+        jsonFileStatus={jsonFileStatus}
+        setJsonFileStatus={setJsonFileStatus}
+      /> */}
+
+      {/* Download file */}
+      <DownloadJsonFileData
         jsonFileStatus={jsonFileStatus}
         setJsonFileStatus={setJsonFileStatus}
       />

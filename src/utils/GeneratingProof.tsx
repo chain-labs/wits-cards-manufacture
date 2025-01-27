@@ -11,8 +11,8 @@ import { keccak256 } from "viem";
 import { CardInfo } from "@/types";
 import { BytesLike, ethers } from "ethers";
 import { getRarityCode, Abstracttestnet_provider } from "@/constants";
-import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
+import { abstractTestnet } from "viem/chains";
 
 const buf2hex = (x: Buffer) => "0x" + x.toString("hex");
 
@@ -187,7 +187,6 @@ export default function GeneratingProof({
   const { jsonCardsInfo, rawJSONdata, updateRawJSONData } = useJSONCards();
   const [loading, setLoading] = useState(false);
   const [receipt, setReceipt] = useState<unknown>();
-  const { chainId } = useAccount();
 
   // Effect to set the active phase button when receipt is available
   useEffect(() => {
@@ -250,7 +249,7 @@ export default function GeneratingProof({
       const uc_name = await contract._NAME();
       const uc_version = await contract._VERSION();
       const uc_address = await contract.getAddress();
-      const uc_chain_id = chainId ?? 0;
+      const uc_chain_id = abstractTestnet.id;
 
       // Generate signatures for each card
       const signaturePromises: Promise<BytesLike>[] = cardInfos.map(

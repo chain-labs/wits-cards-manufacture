@@ -6,7 +6,7 @@ import { useSelectedCardsTable } from "@/store";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export default function ManufacturingCards({
+export default function UploadingCards({
   state,
   settingActivePhaseButton,
 }: {
@@ -45,7 +45,7 @@ export default function ManufacturingCards({
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = "claim-cards.json";
+      link.download = "claimCards.json";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -64,9 +64,9 @@ export default function ManufacturingCards({
   return (
     <Button
       type="button"
-      disabled={state["Manufacture"].disabled || loading}
+      disabled={state["Uploading"].disabled || loading}
       variant={
-        state["Manufacture"].success
+        state["Uploading"].success
           ? "success"
           : loading
           ? "loading"
@@ -74,7 +74,7 @@ export default function ManufacturingCards({
       }
       onClick={handleClaimCards}
     >
-      Download JSON File
+      Upload JSON File
     </Button>
   );
 }
