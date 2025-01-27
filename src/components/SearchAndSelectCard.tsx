@@ -26,6 +26,7 @@ interface SearchAndSelectProps{
   emptyListMessage?: string;
   value: Card | null;
   setValue: React.Dispatch<React.SetStateAction<Card | null>>;
+  disabled?: boolean;
 }
 
 export function SearchAndSelectCard({
@@ -34,6 +35,7 @@ export function SearchAndSelectCard({
   emptyListMessage = "No item found.",
   value,
   setValue,
+  disabled,
 }: SearchAndSelectProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -45,6 +47,7 @@ export function SearchAndSelectCard({
           role="combobox"
           aria-expanded={open}
           className="w-[200px] justify-between"
+          disabled={disabled}
         >
           {value ? list.find((l) => l.tid === value.tid)?.tid : searchPlaceholder}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

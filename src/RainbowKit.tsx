@@ -3,7 +3,7 @@
 import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { WagmiProvider } from "wagmi";
-import { skaleNebulaTestnet } from "viem/chains";
+import { abstractTestnet } from "viem/chains";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { PROJECT_ID } from "@/constants";
 
@@ -15,7 +15,7 @@ interface Props {
 export const config = getDefaultConfig({
   appName: "wits",
   projectId: PROJECT_ID,
-  chains: [skaleNebulaTestnet],
+  chains: [abstractTestnet],
   ssr: true, // If your dApp uses server side rendering (SSR)
 });
 

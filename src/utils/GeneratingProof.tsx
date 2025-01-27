@@ -1,6 +1,6 @@
 "use client";
 
-import useSkaleNebulaTestnet from "@/abi/SkaleNebulaTestnet";
+import useSkaleNebulaTestnet from "@/abi/AbstractTestnet";
 import { buttonStates } from "@/app/Manufacutre";
 import { Button } from "@/components/ui/button";
 import { useSelectedCardsTable } from "@/store";
@@ -8,9 +8,9 @@ import { useEffect, useState } from "react";
 // import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { MerkleTree } from "merkletreejs";
 import { keccak256 } from "viem";
-import { CardWithQuantity } from "@/types";
+import { CardInfo } from "@/types";
 import { BytesLike, ethers } from "ethers";
-import { Skalatestnet_provider } from "@/constants";
+import { getRarityCode, Abstracttestnet_provider } from "@/constants";
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
 
@@ -33,27 +33,18 @@ function ascii_to_hexa(str: string) {
   return arr1.join("");
 }
 
-function generateLeaf(
-  card: {
-    id: number;
-    uniqueCode: number;
-    rarity: number | string;
-    tid: string;
-    faction: string;
-  },
-  CARD_STRUCT_HASH: string,
-) {
+function generateLeaf(card: CardInfo, CARD_STRUCT_HASH: string) {
   console.log("card", card);
   return keccak256(
     // @ts-expect-error - The types are not correct
     ethers.AbiCoder.defaultAbiCoder().encode(
-      ["bytes32", "uint256", "uint256", "string", "bytes32", "bytes32"],
+      ["bytes32", "uint256", "uint256", "uint8", "bytes32", "bytes32"],
       [
         CARD_STRUCT_HASH,
-        card.id,
+        card.assignedTokenId,
         card.uniqueCode,
-        card.rarity,
-        keccak256(`0x${ascii_to_hexa(card.tid)}`),
+        getRarityCode(card.rarity as string),
+        keccak256(`0x${ascii_to_hexa(card.name)}`),
         keccak256(`0x${ascii_to_hexa(card.faction)}`),
       ],
     ),
@@ -65,13 +56,7 @@ async function generateSignature(
   UC_VERSION: string,
   UC_CHAIN_ID: bigint,
   ucAddress: `0x${string}`,
-  card: {
-    assignedTokenId: number;
-    uniqueCode: number;
-    rarity: number | string;
-    name: string;
-    faction: string;
-  },
+  card: CardInfo,
   signer: unknown,
 ): Promise<BytesLike> {
   const TYPED_DATA = {
@@ -79,7 +64,7 @@ async function generateSignature(
       CardInfo: [
         { name: "assignedTokenId", type: "uint256" },
         { name: "uniqueCode", type: "uint16" },
-        { name: "rarity", type: "string" },
+        { name: "rarity", type: "uint8" },
         { name: "name", type: "string" },
         { name: "faction", type: "string" },
       ],
@@ -94,7 +79,7 @@ async function generateSignature(
     message: {
       assignedTokenId: card.assignedTokenId,
       uniqueCode: card.uniqueCode,
-      rarity: card.rarity,
+      rarity: getRarityCode(card.rarity as string),
       name: card.name,
       faction: card.faction,
     },
@@ -135,7 +120,7 @@ async function generateSignature(
 }
 
 function saveArraysToJSON(
-  chainId: bigint,
+  chainId: number,
   array1: unknown[],
   array2: unknown[],
 ): void {
@@ -149,8 +134,10 @@ function saveArraysToJSON(
   console.log(data);
 
   // fs.writeFileSync(filename, JSON.stringify(data, null, 2));
-  // store in local storage
-  localStorage.setItem("claimCards", JSON.stringify(data));
+  // store in local storage with BigInt handling
+  localStorage.setItem("claimCards", JSON.stringify(data, (_, value) =>
+    typeof value === 'bigint' ? value.toString() : value
+  ));
 }
 
 /**
@@ -182,11 +169,11 @@ export default function GeneratingProof({
   // State and hooks initialization
   const SkaleNebulaTestnet = useSkaleNebulaTestnet();
   const {
-    list: cardInfos,
+    cards: cardInfos,
     generatingProof,
     allocatingTokensData,
   } = useSelectedCardsTable() as {
-    list: CardWithQuantity[];
+    cards: CardInfo[];
     generatingProof: (data: unknown) => void;
     allocatingTokensData: { hash: string };
   };
@@ -208,7 +195,7 @@ export default function GeneratingProof({
   async function handleGenerateProof() {
     setLoading(true);
     try {
-      const provider = ethers.getDefaultProvider(Skalatestnet_provider);
+      const provider = ethers.getDefaultProvider(Abstracttestnet_provider);
       console.log("provider", provider);
 
       const userWalletWithProvider = new ethers.Wallet(privateKey, provider);
@@ -226,16 +213,7 @@ export default function GeneratingProof({
 
       // TODO: add previous proof to the tree
       const leaves = cardInfos.map((cardInfo) =>
-        generateLeaf(
-          {
-            id: cardInfo.id,
-            uniqueCode: cardInfo.id,
-            rarity: cardInfo.rarity,
-            tid: cardInfo.tid,
-            faction: cardInfo.team,
-          },
-          CARD_STRUCT_HASH,
-        ),
+        generateLeaf(cardInfo, CARD_STRUCT_HASH),
       );
 
       console.log("leaves", leaves);
@@ -271,13 +249,7 @@ export default function GeneratingProof({
             uc_version,
             BigInt(uc_chain_id),
             uc_address as `0x${string}`,
-            {
-              assignedTokenId: cardInfo.id,
-              uniqueCode: cardInfo.id,
-              rarity: cardInfo.rarity,
-              name: cardInfo.tid,
-              faction: cardInfo.team,
-            },
+            cardInfo,
             userWalletWithProvider,
           ),
       );
@@ -306,8 +278,10 @@ export default function GeneratingProof({
         );
       }
 
+      console.log(uc_chain_id, data, links);
+
       // Save data and links to JSON
-      saveArraysToJSON(BigInt(uc_chain_id), data, links);
+      saveArraysToJSON(uc_chain_id, data, links);
 
       setReceipt(true);
     } catch (err) {

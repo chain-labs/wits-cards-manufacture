@@ -1,11 +1,9 @@
-export type Rarity = "common" | "uncommon" | "rare" | "mythical" | "legendary";
-
 export interface Card {
   id: number;
   tid: string;
   type: string;
   alliance: string;
-  rarity: Rarity;
+  rarity: number | string;
   mana: number;
   attack: number;
   hp: number;
@@ -18,3 +16,11 @@ export interface Card {
 export type CardWithQuantity = {
   quantity: number;
 } & Card;
+
+export type CardInfo = {
+  assignedTokenId: number | bigint;
+  uniqueCode: number | bigint;
+  rarity: number | bigint | string;
+  name: string;
+  faction: string;
+};

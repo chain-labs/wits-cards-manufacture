@@ -58,7 +58,6 @@ function CardQuantity({
 
 export default function TableWithCardData() {
   const { list, disableUpdate } = useSelectedCardsTable();
-
   return (
     <Table
       header={["Name", "Quantity"]}

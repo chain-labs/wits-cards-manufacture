@@ -1,13 +1,13 @@
 "use client";
 
-import useSkaleNebulaTestnet from "@/abi/SkaleNebulaTestnet";
+import useAbstractTestnet from "@/abi/AbstractTestnet";
 import { buttonStates } from "@/app/Manufacutre";
 import { Button } from "@/components/ui/button";
 import { useSelectedCardsTable } from "@/store";
 import { useEffect, useState } from "react";
 // import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { ethers } from "ethers";
-import { Skalatestnet_provider } from "@/constants";
+import { Abstracttestnet_provider } from "@/constants";
 import toast from "react-hot-toast";
 
 export default function AllocatingTokens({
@@ -30,7 +30,7 @@ export default function AllocatingTokens({
   // const { data: receipt } = useWaitForTransactionReceipt({
   //   hash: hash,
   // });
-  const SkaleNebulaTestnet = useSkaleNebulaTestnet();
+  const AbstractTestnet = useAbstractTestnet();
   const { count: cardsCount, allocatingTokens } = useSelectedCardsTable();
   const [loading, setLoading] = useState(false);
   const [receipt, setReceipt] = useState();
@@ -47,21 +47,21 @@ export default function AllocatingTokens({
     setLoading(true);
     try {
       // const tokensData = await allocateTokens({
-      //   address: SkaleNebulaTestnet.address as `0x${string}`,
-      //   abi: SkaleNebulaTestnet.abi || [],
+      //   address: AbstractTestnet.address as `0x${string}`,
+      //   abi: AbstractTestnet.abi || [],
       //   functionName: "allocateTokens",
       //   args: [cardsCount],
       //   account: privateKey,
       // });
       // allocatingTokens(tokensData);
 
-      const provider = ethers.getDefaultProvider(Skalatestnet_provider);
+      const provider = ethers.getDefaultProvider(Abstracttestnet_provider);
 
       const userWalletWithProvider = new ethers.Wallet(privateKey, provider);
 
       const contract = new ethers.Contract(
-        SkaleNebulaTestnet.address ?? "0x",
-        SkaleNebulaTestnet.abi ?? [],
+        AbstractTestnet.address ?? "0x",
+        AbstractTestnet.abi ?? [],
         userWalletWithProvider
       );
 

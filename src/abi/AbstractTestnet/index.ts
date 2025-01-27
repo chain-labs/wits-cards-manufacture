@@ -1,4 +1,4 @@
-import { skaleNebulaTestnet } from "viem/chains";
+import { abstractTestnet } from "viem/chains";
 
 interface IContract {
   address?: `0x${string}`;
@@ -10,14 +10,14 @@ import { CONTRACTS } from "../config";
 import { zeroAddress } from "viem";
 import { useEffect, useState } from "react";
 
-const useSkaleNebulaTestnet = () => {
+const useAbstractTestnet = () => {
   const [contract, setContract] = useState<IContract>({
     abi: [],
     address: zeroAddress,
   });
 
   useEffect(() => {
-    const address = CONTRACTS[skaleNebulaTestnet.id];
+    const address = CONTRACTS[abstractTestnet.id];
     if (address) {
       setContract({ address, abi });
     }
@@ -26,4 +26,4 @@ const useSkaleNebulaTestnet = () => {
   return contract;
 };
 
-export default useSkaleNebulaTestnet;
+export default useAbstractTestnet;
