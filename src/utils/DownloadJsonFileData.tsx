@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import useCards from "@/hooks/useCards";
 import { ClaimData, JsonData, useJSONCards } from "@/store";
 import { useState } from "react";
@@ -12,6 +13,7 @@ export default function DownloadJsonFileData({
   setJsonFileStatus: (status: boolean) => void;
 }) {
   const [error, setError] = useState<string | null>(null);
+  const [url, setUrl] = useState<string>("");
   const {
     addJSONCardInfo,
     addJSONCard,
@@ -71,7 +73,8 @@ export default function DownloadJsonFileData({
 
   const handleFileDownload = async () => {
     try {
-      const response = await fetch("https://wits.b-cdn.net/claimCards.json");
+      if (!url) return;
+      const response = await fetch(url);
       const parsedData = await response.json();
       console.log("parsedData---", parsedData);
       if (validateJsonFormat(parsedData)) {
@@ -91,12 +94,23 @@ export default function DownloadJsonFileData({
   };
 
   return (
-    <Button
-      type="button"
-      onClick={handleFileDownload}
-      disabled={error !== null || jsonFileStatus}
-    >
-      Download File
-    </Button>
+    <div className="flex flex-col gap-4">
+      <Input
+        type="text"
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+        placeholder="Enter JSON file URL"
+        className="bg-white"
+        disabled={jsonFileStatus}
+      />
+      <Button
+        type="button"
+        onClick={handleFileDownload}
+        disabled={jsonFileStatus}
+      >
+        Download File
+      </Button>
+      {error && <p className="text-red-500">{error}</p>}
+    </div>
   );
 }
