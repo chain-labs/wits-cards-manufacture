@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 // const HOSTNAME = REGION ? `${REGION}.${BASE_HOSTNAME}` : BASE_HOSTNAME;
 // const STORAGE_ZONE_NAME = "wits-cdn";
 // const FILENAME_TO_UPLOAD = "claimCards.json";
-// const ACCESS_KEY = "eed68a17-ec3b-49b5-beb545ac3656-62a1-4e47";
+// const ACCESS_KEY = "";
 
 export default function UploadingCards({
   state,
