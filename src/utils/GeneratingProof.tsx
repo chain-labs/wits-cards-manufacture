@@ -192,7 +192,7 @@ export default function GeneratingProof({
   useEffect(() => {
     if (receipt) {
       toast.success("Proof generated successfully");
-      settingActivePhaseButton("Manufacture");
+      settingActivePhaseButton("Uploading");
     }
   }, [receipt]);
 

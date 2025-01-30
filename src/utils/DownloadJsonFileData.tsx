@@ -73,9 +73,9 @@ export default function DownloadJsonFileData({
     try {
       const response = await fetch("https://wits.b-cdn.net/claimCards.json");
       const parsedData = await response.json();
-      console.log('parsedData---', parsedData);
+      console.log("parsedData---", parsedData);
       if (validateJsonFormat(parsedData)) {
-        console.log('parsed', parsedData);
+        console.log("parsed", parsedData);
         updateRawJSONData(parsedData);
         handleCardsUpload(parsedData);
         setError(null);
@@ -92,6 +92,7 @@ export default function DownloadJsonFileData({
 
   return (
     <Button
+      type="button"
       onClick={handleFileDownload}
       disabled={error !== null || jsonFileStatus}
     >

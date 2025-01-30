@@ -37,7 +37,11 @@ const diabledButtonsState: Record<
   },
 };
 
-export default function Manufacutre() {
+export default function Manufacutre({
+  changeState,
+}: {
+  changeState: () => void;
+}) {
   const [state, setState] = useState<
     Record<
       buttonStates,
@@ -164,11 +168,7 @@ export default function Manufacutre() {
           privateKey={value as `0x${string}`}
           settingActivePhaseButton={settingActivePhaseButton}
         />
-        <UploadingCards
-          privateKey={value as `0x${string}`}
-          state={state}
-          settingActivePhaseButton={settingActivePhaseButton}
-        />
+        <UploadingCards state={state} changeState={changeState} />
       </div>
     </div>
   );

@@ -9,12 +9,13 @@ import GetCardData from "@/components/GetCardData";
 import TableWithCardData from "@/components/TableWithCardData";
 import { useEffect, useState } from "react";
 import Manufacutre from "./Manufacutre";
+import Idle from "./Idle";
 
 type States = "selection" | "manufacture" | "idle";
 
 export default function Home() {
   const { count } = useSelectedCardsTable();
-  const [state, setState] = useState<States>("selection");
+  const [state, setState] = useState<States>("idle");
 
   useEffect(() => {
     if (count === 0) {
@@ -48,11 +49,11 @@ export default function Home() {
               </Button>
             </>
           ),
-          manufacture: <Manufacutre />,
-          idle: <></>,
+          manufacture: <Manufacutre changeState={() => setState("idle")} />,
+          idle: <Idle resetStates={() => setState("selection")} />,
         }[state]
       }
-      <TableWithCardData />
+      {state !== "idle" && <TableWithCardData />}
     </div>
   );
 }
