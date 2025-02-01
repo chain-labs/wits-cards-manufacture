@@ -53,6 +53,7 @@ Note: You can use any reliable file hosting service of your choice, such as AWS 
 - Make sure to complete all steps in order
 - Double-check the filename when uploading to Bunny.net
 - Each step must be completed successfully before moving to the next one
+
 ## JSON Structure
 
 The `claimCards.json` file must follow this specific structure:
@@ -102,4 +103,6 @@ The `claimCards.json` file must follow this specific structure:
 - The structure must be valid JSON
 
 ## Support
-If you encounter any issues or need assistance, please contact the WITS support team.
+If you encounter any issues or need assistance, please contact our support team:
+- GitHub: [https://github.com/PRATHAM1ST](https://github.com/PRATHAM1ST)
+- Discord: [https://discord.com/channels/1229872467468750930/1334521506025312371](https://discord.com/channels/1229872467468750930/1334521506025312371)
